@@ -1,12 +1,13 @@
 import javafx.scene.shape.Circle;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class State {
     private boolean isFinal;
-    String name;
-    HashMap<String, State> transitions;
-    Circle visual;
+    private String name;
+    private HashMap<String, State> transitions;
+    private Circle visual;
 
     public State(){
 
@@ -50,5 +51,13 @@ public class State {
 
     public void setVisual(Circle visual) {
         this.visual = visual;
+    }
+
+    public ArrayList<State> getTransitionStates(){
+        return new ArrayList<>(transitions.values());
+    }
+
+    public ArrayList<String> getInput(){
+        return new ArrayList<>(transitions.keySet());
     }
 }
