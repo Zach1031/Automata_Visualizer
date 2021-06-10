@@ -72,6 +72,25 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
+        ArrayList<State> test = new ArrayList<>();
+
+        State state1 = new State();
+        State state2 = new State();
+
+        state1.setName("q1");
+        state2.setName("q2");
+
+
+        state1.addTransition("0", state2);
+        state2.addTransition("1", state1);
+
+        state2.setFinal(true);
+
+        test.add(state1);
+        test.add(state2);
+
+        System.out.println(Translator.translateAutomata(test));
+
         Group root = new Group();
 
         EventHandler<MouseEvent> click = e -> {

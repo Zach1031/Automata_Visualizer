@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Translator {
 
@@ -14,7 +15,7 @@ public class Translator {
 
             Q.add(s.getName());
 
-            delta.add(translateDelta(s));
+            delta.addAll(translateDelta(s));
 
             if(s.isFinal()){ finalState.add(s); }
         }
@@ -22,23 +23,23 @@ public class Translator {
         return machineToString(sigma, Q, delta, finalState);
     }
 
-    public static Transition translateDelta(State s){
-        Transition transition = new Transition();
+    public static ArrayList<Transition> translateDelta(State s){
+        ArrayList<Transition> deltas = new ArrayList<>();
+        HashMap<String, ArrayList<State>> transitions = s.getTransitions();
 
-        transition.setStartingState(s.getName());
-        transition.setOutputStates();
+        for(String input : transitions.keySet()){
+            deltas.add(new Transition(s.getName(), input, transitions.get(input)));
+        }
+
+
+        return deltas;
     }
 
     public static String machineToString(ArrayList<String> sigma, ArrayList<String> Q, ArrayList<Transition> delta, ArrayList<State> finalState){
         String returnString = "Σ: " + sigma + "\n";
         returnString += "Q: " + Q + "\n";
-        returnString += "δ: " + delta + "\n";
+        returnString += "Δ: " + delta + "\n";
         returnString += "F: " + finalState + "\n";
-
-        System.out.println("Σ: " + sigma);
-        System.out.println("Q: " + Q);
-        System.out.println("δ: " + delta);
-        System.out.println("F: " + finalState);
 
         return returnString;
     }

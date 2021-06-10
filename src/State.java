@@ -6,7 +6,7 @@ import java.util.HashMap;
 public class State {
     private boolean isFinal;
     private String name;
-    private HashMap<String, State> transitions;
+    private HashMap<String, ArrayList<State>> transitions = new HashMap<>();
     private Circle visual;
 
     public State(){
@@ -41,8 +41,23 @@ public class State {
         this.name = name;
     }
 
+    //Add Transition doesn't work
     public void addTransition(String input, State goTo){
-        transitions.put(input, goTo);
+        ArrayList<State> transitionStates = new ArrayList<>();
+
+        if(transitions.containsKey(input)){
+            transitionStates.addAll(transitions.get(input));
+
+            transitionStates.add(goTo);
+            transitions.remove(input);
+        }
+
+        transitionStates.add(goTo);
+        transitions.put(input,transitionStates);
+    }
+
+    public HashMap<String, ArrayList<State>> getTransitions(){
+        return transitions;
     }
 
     public Circle getVisual() {
@@ -54,10 +69,20 @@ public class State {
     }
 
     public ArrayList<State> getTransitionStates(){
-        return new ArrayList<>(transitions.values());
+        ArrayList<State> transitionStates = new ArrayList<>();
+        for(ArrayList<State> goToList : transitions.values()){
+            transitionStates.addAll(goToList);
+        }
+
+        return transitionStates;
     }
 
     public ArrayList<String> getInput(){
         return new ArrayList<>(transitions.keySet());
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

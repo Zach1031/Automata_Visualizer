@@ -3,13 +3,13 @@ import java.util.ArrayList;
 public class Transition {
     private String startingState;
     private String input;
-    private ArrayList<String> outputStates;
+    private ArrayList<State> outputStates;
 
     public Transition(){
 
     }
 
-    public Transition(String startingState, String input, ArrayList<String> outputStates){
+    public Transition(String startingState, String input, ArrayList<State> outputStates){
         this.startingState = startingState;
         this.input = input;
         this.outputStates = outputStates;
@@ -31,16 +31,16 @@ public class Transition {
         this.input = input;
     }
 
-    public ArrayList<String> getOutputStates() {
+    public ArrayList<State> getOutputStates() {
         return outputStates;
     }
 
-    public void setOutputStates(ArrayList<String> outputStates) {
+    public void setOutputStates(ArrayList<State> outputStates) {
         this.outputStates = outputStates;
     }
 
     @Override
     public String toString() {
-        return "";
+        return String.format("δ(%s, %s, " + outputStates + ")", startingState, input) ;
     }
 }
