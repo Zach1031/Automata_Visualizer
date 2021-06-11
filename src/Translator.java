@@ -4,21 +4,12 @@ import java.util.HashMap;
 public class Translator {
 
 
+    //I should probably organize this a bit
     public static String translateAutomata(ArrayList<State> stateList){
-        ArrayList<String> sigma = new ArrayList<>();
-        ArrayList<String> Q = new ArrayList<>();
-        ArrayList<Transition> delta = new ArrayList<>();
-        ArrayList<State> finalState = new ArrayList<>();
-
-        for(State s : stateList){
-            sigma = addToSigma(sigma, s);
-
-            Q.add(s.getName());
-
-            delta.addAll(translateDelta(s));
-
-            if(s.isFinal()){ finalState.add(s); }
-        }
+        ArrayList<String> sigma = getSigma(stateList);
+        ArrayList<String> Q = getQ(stateList);
+        ArrayList<Transition> delta = getDelta(stateList);
+        ArrayList<State> finalState = getF(stateList);
 
         return machineToString(sigma, Q, delta, finalState);
     }
@@ -54,15 +45,45 @@ public class Translator {
         return sigma;
     }
 
+    public static ArrayList<String> getSigma(ArrayList<State> stateList){
+        ArrayList<String> sigma = new ArrayList<>();
+
+        for(State s : stateList){
+            sigma = addToSigma(sigma, s);
+        }
+
+        return sigma;
+    }
+
     public static ArrayList<Transition> getDelta(ArrayList<State> stateList){
         ArrayList<Transition> delta = new ArrayList<>();
-
-
         for(State s : stateList){
             delta.addAll(translateDelta(s));
         }
 
         return delta;
+    }
+
+    public static ArrayList<String> getQ(ArrayList<State> stateList){
+        ArrayList<String> Q = new ArrayList<>();
+
+        for(State s : stateList){
+            Q.add(s.getName());
+        }
+
+        return Q;
+    }
+
+    public static ArrayList<State> getF(ArrayList<State> stateList){
+        ArrayList<State> F = new ArrayList<>();
+
+        for(State s : stateList){
+            if(s.isFinal()){
+                F.add(s);
+            }
+        }
+
+        return F;
     }
 
 }
