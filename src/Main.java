@@ -1,4 +1,5 @@
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point2D;
@@ -72,6 +73,8 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
+
+        //Test state creation and translation [DELETE WHEN DONE]
         ArrayList<State> test = new ArrayList<>();
 
         State state1 = new State();
@@ -91,7 +94,30 @@ public class Main extends Application {
 
         System.out.println(Translator.translateAutomata(test));
 
+        //Test for running NFA
+        ArrayList<String> sigma = new ArrayList<>();
+        sigma.add("0");
+        sigma.add("1");
+
+        ArrayList<State> q0 = new ArrayList<>();
+        q0.add(state1);
+
+        ArrayList<State> F = new ArrayList<>();
+        F.add(state2);
+
+        ArrayList<Transition> delta = Translator.getDelta(test);
+
+        System.out.println(NFAInterpreter.translateNFA("0101010101010", sigma, q0, delta, F, 0));
+
+
+
         Group root = new Group();
+
+        Button translate = new Button("Translate");
+
+        translate.setOnAction(event -> Translator.translateAutomata(new ArrayList<>(stateList.values())));
+
+        root.getChildren().add(translate);
 
         EventHandler<MouseEvent> click = e -> {
             if(onCircle(e.getX(), e.getY())){

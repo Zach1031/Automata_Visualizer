@@ -28,7 +28,7 @@ public class Translator {
         HashMap<String, ArrayList<State>> transitions = s.getTransitions();
 
         for(String input : transitions.keySet()){
-            deltas.add(new Transition(s.getName(), input, transitions.get(input)));
+            deltas.add(new Transition(s, input, transitions.get(input)));
         }
 
 
@@ -52,6 +52,17 @@ public class Translator {
         }
 
         return sigma;
+    }
+
+    public static ArrayList<Transition> getDelta(ArrayList<State> stateList){
+        ArrayList<Transition> delta = new ArrayList<>();
+
+
+        for(State s : stateList){
+            delta.addAll(translateDelta(s));
+        }
+
+        return delta;
     }
 
 }

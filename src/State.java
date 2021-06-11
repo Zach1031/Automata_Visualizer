@@ -2,6 +2,7 @@ import javafx.scene.shape.Circle;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class State {
     private boolean isFinal;
@@ -10,7 +11,9 @@ public class State {
     private Circle visual;
 
     public State(){
-
+        this.name = "";
+        this.isFinal = false;
+        transitions = new HashMap<>();
     }
 
     public State(String name, boolean isFinal, int x, int y){
@@ -84,5 +87,13 @@ public class State {
     @Override
     public String toString() {
         return name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        State state = (State) o;
+        return isFinal == state.isFinal && Objects.equals(name, state.name) && Objects.equals(transitions, state.transitions) && Objects.equals(visual, state.visual);
     }
 }

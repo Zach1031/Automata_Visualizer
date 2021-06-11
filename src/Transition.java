@@ -1,25 +1,27 @@
 import java.util.ArrayList;
 
 public class Transition {
-    private String startingState;
+    private State startingState;
     private String input;
     private ArrayList<State> outputStates;
 
     public Transition(){
-
+        this.startingState = new State();
+        this.input = "ε";
+        this.outputStates = new ArrayList<>();
     }
 
-    public Transition(String startingState, String input, ArrayList<State> outputStates){
+    public Transition(State startingState, String input, ArrayList<State> outputStates){
         this.startingState = startingState;
         this.input = input;
         this.outputStates = outputStates;
     }
 
-    public String getStartingState() {
+    public State getStartingState() {
         return startingState;
     }
 
-    public void setStartingState(String startingState) {
+    public void setStartingState(State startingState) {
         this.startingState = startingState;
     }
 
