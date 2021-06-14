@@ -41,7 +41,7 @@ public class NFAInterpreter {
         return false;
     }
 
-    public static boolean translateNFA(String input, ArrayList<String> Sigma, ArrayList<State> q0, ArrayList<Transition> delta, ArrayList<State> F, int depth){
+    public static boolean NFARunner(String input, ArrayList<String> Sigma, ArrayList<State> q0, ArrayList<Transition> delta, ArrayList<State> F, int depth){
         if(q0.size() == 0) {return false;}
         if(depth >= 50) { return false;}
         if(input.equals("")){
@@ -58,16 +58,23 @@ public class NFAInterpreter {
             ArrayList<State> nonEpsilons = nonEpsilonTransition(delta, s, input.substring(0,1));
 
             if(epsilons.size() == 0){
-                return translateNFA(input.substring(1), Sigma, nonEpsilons, delta, F, ++depth);
+                return NFARunner(input.substring(1), Sigma, nonEpsilons, delta, F, ++depth);
             }
 
             else if(nonEpsilons.size() == 0){
-                translateNFA(input, Sigma, epsilons, delta, F, ++depth);
+                NFARunner(input, Sigma, epsilons, delta, F, ++depth);
             }
 
-            return translateNFA(input, Sigma, epsilonTransitions(delta, s), delta, F, ++depth) || translateNFA(input.substring(1), Sigma, nonEpsilonTransition(delta, s, input.substring(0,1)), delta, F, ++depth);
+            return NFARunner(input, Sigma, epsilonTransitions(delta, s), delta, F, ++depth) || NFARunner(input.substring(1), Sigma, nonEpsilonTransition(delta, s, input.substring(0,1)), delta, F, ++depth);
         }
 
         return false;
+    }
+
+    public static boolean translateNFA(String input, ArrayList<String> Sigma, State startState, ArrayList<Transition> delta, ArrayList<State> F){
+        ArrayList<State> q0 = new ArrayList<>();
+        q0.add(startState);
+
+        return NFARunner(input, Sigma, q0, delta, F, 0);
     }
 }

@@ -6,8 +6,9 @@ import java.util.Objects;
 
 public class State {
     private boolean isFinal;
+    private boolean isStart;
     private String name;
-    private HashMap<String, ArrayList<State>> transitions = new HashMap<>();
+    private HashMap<String, ArrayList<State>> transitions;
     private Circle visual;
 
     public State(){
@@ -35,6 +36,10 @@ public class State {
     public void setFinal(boolean isFinal){
         this.isFinal = isFinal;
     }
+
+    public boolean isStart(){ return isStart; }
+
+    public void setStart(boolean isStart) {this.isStart = isStart;}
 
     public String getName() {
         return name;
