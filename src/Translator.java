@@ -28,12 +28,12 @@ public class Translator {
 
 
     //I should probably organize this a bit
-    public static String translateAutomata(ArrayList<State> stateList, ArrayList<Transition> transitionList){
-        ArrayList<String> sigma = getSigma(stateList);
-        ArrayList<String> Q = getQ(stateList);
-        State q0 = getQ0(stateList);
-        ArrayList<Transition> delta = transitionList;
-        ArrayList<State> finalState = getF(stateList);
+    public static String translateAutomata(HashMap<LineTransition, String> transitionList, HashMap<Circle, State> stateList){
+        ArrayList<String> sigma = getSigma(new ArrayList<>(transitionList.values()));
+        ArrayList<String> Q = getQ(new ArrayList<>(stateList.values()));
+        State q0 = getQ0(new ArrayList<>(stateList.values()));
+        ArrayList<Transition> delta = lineTransitionToTransition(transitionList, stateList);
+        ArrayList<State> finalState = getF(new ArrayList<>(stateList.values()));
 
         return machineToString(sigma, Q, q0, delta, finalState);
     }
@@ -76,21 +76,14 @@ public class Translator {
         return returnString;
     }
 
-    public static ArrayList<String> addToSigma(ArrayList<String> sigma, State s){
-        for(String input : s.getInput()){
-            if(!sigma.contains(input)){
-                sigma.add(input);
-            }
-        }
 
-        return sigma;
-    }
-
-    public static ArrayList<String> getSigma(ArrayList<State> stateList){
+    public static ArrayList<String> getSigma(ArrayList<String> transitions){
         ArrayList<String> sigma = new ArrayList<>();
 
-        for(State s : stateList){
-            sigma = addToSigma(sigma, s);
+        for(String s : transitions){
+            if(!sigma.contains(s)){
+                sigma.add(s);
+            }
         }
 
         return sigma;

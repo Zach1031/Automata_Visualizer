@@ -1,4 +1,7 @@
+import javafx.scene.shape.Circle;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class NFAInterpreter {
     private static ArrayList<State> epsilonTransitions(ArrayList<Transition> delta, State s){
@@ -71,7 +74,13 @@ public class NFAInterpreter {
         return false;
     }
 
-    public static boolean translateNFA(String input, ArrayList<String> Sigma, State startState, ArrayList<Transition> delta, ArrayList<State> F){
+    public static boolean translateNFA(String input, HashMap<LineTransition, String> transitionList, HashMap<Circle, State> stateList){
+        //String input, ArrayList<String> Sigma, State startState, ArrayList<Transition> delta, ArrayList<State> F
+        ArrayList<String> Sigma = Translator.getSigma(new ArrayList<>(transitionList.values()));
+        State startState = Translator.getQ0(new ArrayList<>(stateList.values()));
+        ArrayList<Transition> delta = Translator.lineTransitionToTransition(transitionList, stateList);
+        ArrayList<State> F = Translator.getF(new ArrayList<>(stateList.values()));
+
         ArrayList<State> q0 = new ArrayList<>();
         q0.add(startState);
 

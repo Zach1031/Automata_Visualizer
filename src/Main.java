@@ -192,7 +192,6 @@ public class Main extends Application {
 
             transitionList.replace(lineTransition, input);
 
-            System.out.println(newTransition);
             editWindow.close();
         });
 
@@ -227,7 +226,7 @@ public class Main extends Application {
         //Create the translate button
         Button translate = new Button("Translate");
         GridPane.setConstraints(translate, 0, 0);
-        translate.setOnAction(e -> System.out.println(Translator.translateAutomata(new ArrayList<>(stateList.values()), Translator.lineTransitionToTransition(transitionList, stateList))));
+        translate.setOnAction(e -> System.out.println(Translator.translateAutomata(transitionList, stateList)));
 
         //Create the run button and input segment
         Button run = new Button("Run");
@@ -236,7 +235,7 @@ public class Main extends Application {
 
         TextField input = new TextField();
         GridPane.setConstraints(input, 2, 0);
-        run.setOnAction(event -> System.out.println(NFAInterpreter.translateNFA(input.getText(), Translator.getSigma(new ArrayList<>(stateList.values())), Translator.getQ0(new ArrayList<>(stateList.values())) , Translator.getDelta(new ArrayList<>(stateList.values())), Translator.getF(new ArrayList<>(stateList.values())))));
+        run.setOnAction(event -> System.out.println(NFAInterpreter.translateNFA(input.getText(), transitionList, stateList)));
 
 
         GridPane.setConstraints(root, 3, 0);
@@ -271,16 +270,13 @@ public class Main extends Application {
         };
         EventHandler<MouseEvent> endDrag = e -> {
             if(onCircle(e.getX(), e.getY()) && (!getCircle(e.getX(), e.getY()).equals(getCircle(currentLine.getStartX(), currentLine.getStartY())))){
-                Circle state1 = getCircle(e.getX(), e.getY());
-                Circle state2 = getCircle(currentLine.getStartX(), currentLine.getStartY());
-                Line newLine = new Line(currentLine.getStartX(), currentLine.getStartY(), state1.getCenterX(), state1.getCenterY());
+                Circle state1 = getCircle(currentLine.getStartX(), currentLine.getStartY());
+                Circle state2 = getCircle(e.getX(), e.getY());
+                Line newLine = new Line(currentLine.getStartX(), currentLine.getStartY(), state2.getCenterX(), state2.getCenterY());
                 root.getChildren().remove(currentLine);
                 newLine.setStrokeWidth(8);
                 root.getChildren().add(newLine);
 
-                System.out.println(stateList.containsKey(state1));
-                System.out.println(stateList);
-                System.out.println("----------");
                 transitionList.put(new LineTransition(state1, newLine, state2), "ε");
 //                transitionList.put(newLine, new Transition(stateList.get(state1), "", stateList.get(state2)));
             }
