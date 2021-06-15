@@ -11,6 +11,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
@@ -26,12 +27,24 @@ import java.util.HashMap;
 
 public class Main extends Application {
     HashMap<Circle, State> stateList = new HashMap<>();
+    HashMap<Line, Transition> transitionList = new HashMap<>();
+
     Stage editWindow;
     Line currentLine;
 
     public boolean onCircle(double x, double y){
         for(Circle c : stateList.keySet()){
             if(c.contains(new Point2D(x, y))){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean onLine(double x, double y){
+        for(Line l : transitionList.keySet()){
+            if(l.contains(new Point2D(x, y))){
                 return true;
             }
         }
@@ -50,8 +63,6 @@ public class Main extends Application {
     }
 
     public Circle createCircle(double x, double y){
-        System.out.println("Create a Circle");
-
         State state = new State();
 
         Circle circle = new Circle();
@@ -70,66 +81,169 @@ public class Main extends Application {
             if(c.contains(new Point2D(x, y))){
                 return c;
             }
-//            if((c.getCenterX() == x) && (c.getCenterY() == y)){
-//                return c;
-//            }
         }
 
         return new Circle();
     }
 
+    public Line getLine(double x, double y){
+        for(Line l : transitionList.keySet()){
+            if(l.contains(new Point2D(x, y))){
+                return l;
+            }
+        }
+
+        return new Line();
+    }
+
     public void editCircle(Circle circle){
+        State state = new State();
+
+        for(Circle c : stateList.keySet()){
+            if(c.equals(circle)){
+                state = stateList.get(c);
+            }
+        }
+
         editWindow = new Stage();
         Label nameLabel = new Label("Name:");
-        TextField nameValue = new TextField();
+        TextField nameValue = new TextField(state.getName());
 
-        Button isFinal = new Button("Final");
+        Label finalLabel = new Label("Final?");
+        CheckBox finalValue = new CheckBox();
+        finalValue.setSelected(state.isFinal());
 
-        editWindow.setScene(new Scene(new Group(nameLabel, nameValue, isFinal), 500, 500));
+        Label startLabel = new Label("Start?");
+        CheckBox startValue = new CheckBox();
+        startValue.setSelected(state.isStart());
+
+        Button save = new Button("Save");
+        save.setOnAction(e -> {
+            State newState = new State();
+            newState.setName(nameValue.getText());
+            newState.setFinal(finalValue.isSelected());
+            newState.setStart(startValue.isSelected());
+            stateList.replace(circle, newState);
+
+            editWindow.close();
+        });
+
+
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(10, 10, 10, 10));
+        grid.setVgap(8);
+        grid.setHgap(10);
+
+        grid.add(nameLabel, 0, 0);
+        grid.add(nameValue, 1, 0);
+        grid.add(startLabel, 0, 1);
+        grid.add(startValue, 1, 1);
+        grid.add(finalLabel, 0 , 2 );
+        grid.add(finalValue, 1, 2);
+        grid.add(save, 10, 10);
+
+
+        editWindow.setScene(new Scene(grid, 500, 300));
         editWindow.show();
+    }
 
-        System.out.println("Edit a Circle");
+    public void editLine(Line line){
+        Transition transition = new Transition();
+
+        for(Line l : transitionList.keySet()){
+            if(l.equals(line)){
+                transition = transitionList.get(l);
+            }
+        }
+
+        editWindow = new Stage();
+        Label inputLabel = new Label("Input:");
+        TextField inputValue = new TextField(transition.getInput());
+
+        Label epsilonLabel = new Label("Epsilon?");
+        CheckBox epsilonValue = new CheckBox();
+        epsilonValue.setSelected(transition.getInput().equals("ε"));
+
+
+        Button save = new Button("Save");
+        save.setOnAction(e -> {
+            Transition newTransition = new Transition();
+
+            if (epsilonValue.isSelected()) {
+                newTransition.setInput("ε");
+            } else {
+                newTransition.setInput(inputValue.getText());
+            }
+
+            transitionList.replace(line, newTransition);
+
+            editWindow.close();
+        });
+
+
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(10, 10, 10, 10));
+        grid.setVgap(8);
+        grid.setHgap(10);
+
+        grid.add(inputLabel, 0, 0);
+        grid.add(inputValue, 1, 0);
+        grid.add(epsilonLabel, 0 , 2 );
+        grid.add(epsilonValue, 1, 2);
+        grid.add(save, 10, 10);
+
+
+        editWindow.setScene(new Scene(grid, 500, 300));
+        editWindow.show();
     }
 
     //THE FORMATING IS NOT CORRECT
     @Override
     public void start(Stage primaryStage) throws Exception{
-//        GridPane grid = new GridPane();
-//        grid.setPadding(new Insets(10, 10, 10, 10));
-//        grid.setVgap(8);
-//        grid.setHgap(10);
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(10, 10, 10, 10));
+        grid.setVgap(8);
+        grid.setHgap(10);
 
         Group root = new Group();
 
+
         //Create the translate button
         Button translate = new Button("Translate");
-//        GridPane.setConstraints(translate, 0, 0);
-        translate.setOnAction(event -> Translator.translateAutomata(new ArrayList<>(stateList.values())));
+        GridPane.setConstraints(translate, 0, 0);
+        translate.setOnAction(e -> System.out.println(Translator.translateAutomata(new ArrayList<>(stateList.values()))));
 
         //Create the run button and input segment
         Button run = new Button("Run");
-//        GridPane.setConstraints(run, 1, 0);
+        GridPane.setConstraints(run, 1, 0);
 
 
         TextField input = new TextField();
-//        GridPane.setConstraints(input, 2, 0);
-        run.setOnAction(event -> NFAInterpreter.translateNFA(input.getText(), Translator.getSigma(new ArrayList<>(stateList.values())), Translator.getQ0(new ArrayList<>(stateList.values())) , Translator.getDelta(new ArrayList<>(stateList.values())), Translator.getF(new ArrayList<>(stateList.values()))));
+        GridPane.setConstraints(input, 2, 0);
+        run.setOnAction(event -> System.out.println(NFAInterpreter.translateNFA(input.getText(), Translator.getSigma(new ArrayList<>(stateList.values())), Translator.getQ0(new ArrayList<>(stateList.values())) , Translator.getDelta(new ArrayList<>(stateList.values())), Translator.getF(new ArrayList<>(stateList.values())))));
 
-//        GridPane.setConstraints(root, 3, 0);
 
-//        grid.getChildren().addAll(translate, run, input);
+        GridPane.setConstraints(root, 3, 0);
+
+        grid.getChildren().addAll(translate, run, input);
+        root.getChildren().add(grid);
+
 
         EventHandler<MouseEvent> click = e -> {
             if(e.getClickCount() == 2) {
                 if (onCircle(e.getX(), e.getY())) {
                     editCircle(getCircle(e.getX(), e.getY()));
                 }
+
+                else if(onLine(e.getX(), e.getY())){
+                    editLine(getLine(e.getX(), e.getY()));
+                }
+
                 else {
                     root.getChildren().add(createCircle(e.getX(), e.getY()));
                 }
             }
         };
-
         EventHandler<MouseEvent> startDrag = e -> {
             if(onCircle(e.getX(), e.getY())){
                 Circle c = getCircle(e.getX(), e.getY());
@@ -138,13 +252,15 @@ public class Main extends Application {
                 root.getChildren().add(currentLine);
             }
         };
-
         EventHandler<MouseEvent> endDrag = e -> {
             if(onCircle(e.getX(), e.getY())){
-                Circle c = getCircle(e.getX(), e.getY());
-                Line newLine = new Line(currentLine.getStartX(), currentLine.getStartY(), c.getCenterX(), c.getCenterY());
+                Circle state1 = getCircle(e.getX(), e.getY());
+                Circle state2 = getCircle(currentLine.getStartX(), currentLine.getStartY());
+                Line newLine = new Line(currentLine.getStartX(), currentLine.getStartY(), state1.getCenterX(), state1.getCenterY());
                 root.getChildren().remove(currentLine);
                 root.getChildren().add(newLine);
+
+                transitionList.put(newLine, new Transition(stateList.get(state1), "", stateList.get(state2)));
             }
 
             else {
@@ -153,7 +269,6 @@ public class Main extends Application {
 
             currentLine = null;
         };
-
         EventHandler<MouseEvent> dragMouse = e -> {
             if(currentLine != null){
                 currentLine.setEndX(e.getX());

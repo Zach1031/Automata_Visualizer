@@ -17,6 +17,14 @@ public class Transition {
         this.outputStates = outputStates;
     }
 
+    public Transition(State startingState, String input, State outputState){
+        this.startingState = startingState;
+        this.input = input;
+        ArrayList<State> outputStates = new ArrayList<>();
+        outputStates.add(outputState);
+        this.outputStates = outputStates;
+    }
+
     public State getStartingState() {
         return startingState;
     }

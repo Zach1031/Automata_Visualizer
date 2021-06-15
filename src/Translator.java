@@ -89,6 +89,10 @@ public class Translator {
     }
 
     public static State getQ0(ArrayList<State> stateList){
+        if(stateList.size() == 0){
+            return new State();
+        }
+
         for(State s : stateList){
             if(s.isStart()){ return s;}
         }
