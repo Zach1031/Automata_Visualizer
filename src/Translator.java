@@ -1,18 +1,57 @@
+import javafx.application.Application;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
+import javafx.scene.Group;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
+import javafx.stage.Stage;
+import sun.java2d.pipe.hw.AccelDeviceEventNotifier;
+
 import java.util.ArrayList;
 import java.util.HashMap;
-
 public class Translator {
 
 
     //I should probably organize this a bit
-    public static String translateAutomata(ArrayList<State> stateList){
+    public static String translateAutomata(ArrayList<State> stateList, ArrayList<Transition> transitionList){
         ArrayList<String> sigma = getSigma(stateList);
         ArrayList<String> Q = getQ(stateList);
         State q0 = getQ0(stateList);
-        ArrayList<Transition> delta = getDelta(stateList);
+        ArrayList<Transition> delta = transitionList;
         ArrayList<State> finalState = getF(stateList);
 
         return machineToString(sigma, Q, q0, delta, finalState);
+    }
+
+    public static ArrayList<Transition> lineTransitionToTransition (HashMap<LineTransition, String> transitionList, HashMap<Circle, State> stateList){
+        ArrayList<Transition> delta = new ArrayList<>();
+
+        for(LineTransition lineTransition : transitionList.keySet()){
+            Circle startCircle = lineTransition.getStartState();
+            Circle endCircle = lineTransition.getEndState();
+            State state1 = stateList.get(startCircle);
+            State state2 = stateList.get(endCircle);
+            String input = transitionList.get(lineTransition);
+
+            delta.add(new Transition(state1, input, state2));
+        }
+
+        return delta;
     }
 
     public static ArrayList<Transition> translateDelta(State s){

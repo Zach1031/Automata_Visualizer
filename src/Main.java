@@ -27,7 +27,7 @@ import java.util.HashMap;
 
 public class Main extends Application {
     HashMap<Circle, State> stateList = new HashMap<>();
-    HashMap<Line, Transition> transitionList = new HashMap<>();
+    HashMap<LineTransition, String> transitionList = new HashMap<>();
 
     Stage editWindow;
     Line currentLine;
@@ -43,7 +43,12 @@ public class Main extends Application {
     }
 
     public boolean onLine(double x, double y){
-        for(Line l : transitionList.keySet()){
+        ArrayList<Line> lineList = new ArrayList<>();
+        for(LineTransition lineTransition : transitionList.keySet()){
+            lineList.add(lineTransition.getLine());
+        }
+
+        for(Line l : lineList){
             if(l.contains(new Point2D(x, y))){
                 return true;
             }
@@ -87,7 +92,12 @@ public class Main extends Application {
     }
 
     public Line getLine(double x, double y){
-        for(Line l : transitionList.keySet()){
+        ArrayList<Line> lineList = new ArrayList<>();
+        for(LineTransition lineTransition : transitionList.keySet()){
+            lineList.add(lineTransition.getLine());
+        }
+
+        for(Line l : lineList){
             if(l.contains(new Point2D(x, y))){
                 return l;
             }
@@ -147,36 +157,42 @@ public class Main extends Application {
         editWindow.show();
     }
 
-    public void editLine(Line line){
-        Transition transition = new Transition();
-
-        for(Line l : transitionList.keySet()){
-            if(l.equals(line)){
-                transition = transitionList.get(l);
+    public LineTransition getTransitionFromLine(Line l){
+        for(LineTransition lineTransition : transitionList.keySet()){
+            if(lineTransition.getLine().equals(l)){
+                return lineTransition;
             }
         }
 
+        return new LineTransition();
+    }
+
+    public void editLine(Line line){
+        LineTransition lineTransition = getTransitionFromLine(line);
+
         editWindow = new Stage();
         Label inputLabel = new Label("Input:");
-        TextField inputValue = new TextField(transition.getInput());
+        TextField inputValue = new TextField(transitionList.get(lineTransition));
 
         Label epsilonLabel = new Label("Epsilon?");
         CheckBox epsilonValue = new CheckBox();
-        epsilonValue.setSelected(transition.getInput().equals("ε"));
+        epsilonValue.setSelected(transitionList.get(lineTransition).equals("ε"));
 
 
         Button save = new Button("Save");
         save.setOnAction(e -> {
             Transition newTransition = new Transition();
+            String input = "";
 
             if (epsilonValue.isSelected()) {
-                newTransition.setInput("ε");
+                input = "ε";
             } else {
-                newTransition.setInput(inputValue.getText());
+                input = inputValue.getText();
             }
 
-            transitionList.replace(line, newTransition);
+            transitionList.replace(lineTransition, input);
 
+            System.out.println(newTransition);
             editWindow.close();
         });
 
@@ -211,7 +227,7 @@ public class Main extends Application {
         //Create the translate button
         Button translate = new Button("Translate");
         GridPane.setConstraints(translate, 0, 0);
-        translate.setOnAction(e -> System.out.println(Translator.translateAutomata(new ArrayList<>(stateList.values()))));
+        translate.setOnAction(e -> System.out.println(Translator.translateAutomata(new ArrayList<>(stateList.values()), Translator.lineTransitionToTransition(transitionList, stateList))));
 
         //Create the run button and input segment
         Button run = new Button("Run");
@@ -248,19 +264,25 @@ public class Main extends Application {
             if(onCircle(e.getX(), e.getY())){
                 Circle c = getCircle(e.getX(), e.getY());
                 currentLine = new Line(c.getCenterX(), c.getCenterY(), c.getCenterX(), c.getCenterY());
+                currentLine.setStrokeWidth(8);
 
                 root.getChildren().add(currentLine);
             }
         };
         EventHandler<MouseEvent> endDrag = e -> {
-            if(onCircle(e.getX(), e.getY())){
+            if(onCircle(e.getX(), e.getY()) && (!getCircle(e.getX(), e.getY()).equals(getCircle(currentLine.getStartX(), currentLine.getStartY())))){
                 Circle state1 = getCircle(e.getX(), e.getY());
                 Circle state2 = getCircle(currentLine.getStartX(), currentLine.getStartY());
                 Line newLine = new Line(currentLine.getStartX(), currentLine.getStartY(), state1.getCenterX(), state1.getCenterY());
                 root.getChildren().remove(currentLine);
+                newLine.setStrokeWidth(8);
                 root.getChildren().add(newLine);
 
-                transitionList.put(newLine, new Transition(stateList.get(state1), "", stateList.get(state2)));
+                System.out.println(stateList.containsKey(state1));
+                System.out.println(stateList);
+                System.out.println("----------");
+                transitionList.put(new LineTransition(state1, newLine, state2), "ε");
+//                transitionList.put(newLine, new Transition(stateList.get(state1), "", stateList.get(state2)));
             }
 
             else {
