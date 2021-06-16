@@ -1,3 +1,4 @@
+import com.sun.javafx.geom.Curve;
 import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -10,15 +11,14 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.CubicCurve;
 import javafx.scene.shape.Line;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import sun.java2d.pipe.hw.AccelDeviceEventNotifier;
 
@@ -73,8 +73,10 @@ public class Main extends Application {
         Circle circle = new Circle();
         circle.setCenterX(x);
         circle.setCenterY(y);
-        circle.setRadius(25.0f);
-        circle.setStrokeWidth(20);
+        circle.setRadius(30f);
+        circle.setStrokeWidth(1);
+        circle.setFill(Color.WHEAT);
+        circle.setStroke(Color.BLACK);
 
         stateList.put(circle, state);
 
@@ -106,6 +108,10 @@ public class Main extends Application {
         return new Line();
     }
 
+//    public Text getText(double x, double y){
+//        for()
+//    }
+
     public void editCircle(Circle circle){
         State state = new State();
 
@@ -133,6 +139,21 @@ public class Main extends Application {
             newState.setName(nameValue.getText());
             newState.setFinal(finalValue.isSelected());
             newState.setStart(startValue.isSelected());
+            if(finalValue.isSelected()){
+                circle.setStrokeWidth(5f);
+            }
+
+            else {
+                circle.setStrokeWidth(1f);
+            }
+
+            if(startValue.isSelected()){
+                circle.setFill(Color.YELLOW);
+            }
+
+            else{
+                circle.setFill(Color.WHEAT);
+            }
             stateList.replace(circle, newState);
 
             editWindow.close();
@@ -226,7 +247,13 @@ public class Main extends Application {
         //Create the translate button
         Button translate = new Button("Translate");
         GridPane.setConstraints(translate, 0, 0);
-        translate.setOnAction(e -> System.out.println(Translator.translateAutomata(transitionList, stateList)));
+        translate.setOnAction(e -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("TRANSLATE RESULTS");
+            alert.setContentText(Translator.translateAutomata(transitionList, stateList));
+
+            alert.showAndWait();
+        });
 
         //Create the run button and input segment
         Button run = new Button("Run");
@@ -235,14 +262,25 @@ public class Main extends Application {
 
         TextField input = new TextField();
         GridPane.setConstraints(input, 2, 0);
-        run.setOnAction(event -> System.out.println(NFAInterpreter.translateNFA(input.getText(), transitionList, stateList)));
+        run.setOnAction(event -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("RUN RESULT");
+            if((NFAInterpreter.translateNFA(input.getText(), transitionList, stateList))){
+                alert.setContentText("Successfully ran machine with input: " + input.getText());
+            }
+
+            else {
+                alert.setContentText("Not able to run machine with input: " + input.getText());
+            }
+
+            alert.showAndWait();
+        });
 
 
         GridPane.setConstraints(root, 3, 0);
 
         grid.getChildren().addAll(translate, run, input);
         root.getChildren().add(grid);
-
 
         EventHandler<MouseEvent> click = e -> {
             if(e.getClickCount() == 2) {
@@ -258,6 +296,21 @@ public class Main extends Application {
                     root.getChildren().add(createCircle(e.getX(), e.getY()));
                 }
             }
+            //Triple means add transition to self
+//            if(e.getClickCount() == 3){
+//                if(onCircle(e.getX(), e.getY())){
+//                    CubicCurve curve = new CubicCurve();
+//                    Circle c = getCircle(e.getX(), e.getY());
+//                    curve.setStartX(c.getCenterX());
+//                    curve.setEndX(c.getCenterX());
+//                    curve.setStartY(c.getCenterY());
+//                    curve.setEndY(c.getCenterY());
+//
+//                    curve.setControlX1(c.getCenterX());
+//                    curve.setControlY1(c.getCenterY()-40f);
+//
+//                    root.getChildren().add(curve);
+//                }}
         };
         EventHandler<MouseEvent> startDrag = e -> {
             if(onCircle(e.getX(), e.getY())){
@@ -266,19 +319,22 @@ public class Main extends Application {
                 currentLine.setStrokeWidth(8);
 
                 root.getChildren().add(currentLine);
+                currentLine.toBack();
             }
         };
+
         EventHandler<MouseEvent> endDrag = e -> {
             if(onCircle(e.getX(), e.getY()) && (!getCircle(e.getX(), e.getY()).equals(getCircle(currentLine.getStartX(), currentLine.getStartY())))){
                 Circle state1 = getCircle(currentLine.getStartX(), currentLine.getStartY());
                 Circle state2 = getCircle(e.getX(), e.getY());
+
                 Line newLine = new Line(currentLine.getStartX(), currentLine.getStartY(), state2.getCenterX(), state2.getCenterY());
                 root.getChildren().remove(currentLine);
                 newLine.setStrokeWidth(8);
                 root.getChildren().add(newLine);
+                newLine.toBack();
 
                 transitionList.put(new LineTransition(state1, newLine, state2), "ε");
-//                transitionList.put(newLine, new Transition(stateList.get(state1), "", stateList.get(state2)));
             }
 
             else {

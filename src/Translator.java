@@ -81,7 +81,7 @@ public class Translator {
         ArrayList<String> sigma = new ArrayList<>();
 
         for(String s : transitions){
-            if(!sigma.contains(s)){
+            if(!sigma.contains(s) && !s.equals("ε")){
                 sigma.add(s);
             }
         }
