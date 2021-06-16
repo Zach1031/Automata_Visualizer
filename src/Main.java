@@ -19,6 +19,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.CubicCurve;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import sun.java2d.pipe.hw.AccelDeviceEventNotifier;
 
@@ -31,6 +32,15 @@ public class Main extends Application {
 
     Stage editWindow;
     Line currentLine;
+
+    public double getCenterXOfLine(double x1, double y1, double x2, double y2){
+        return (x1 + x2) / 2;
+    }
+
+    public double getCenterYOfLine(double x1, double y1, double x2, double y2){
+        return (y1 + y2) / 2;
+    }
+
 
     public boolean onCircle(double x, double y){
         for(Circle c : stateList.keySet()){
@@ -233,7 +243,6 @@ public class Main extends Application {
         editWindow.show();
     }
 
-    //THE FORMATING IS NOT CORRECT
     @Override
     public void start(Stage primaryStage) throws Exception{
         GridPane grid = new GridPane();
@@ -286,10 +295,46 @@ public class Main extends Application {
             if(e.getClickCount() == 2) {
                 if (onCircle(e.getX(), e.getY())) {
                     editCircle(getCircle(e.getX(), e.getY()));
+
+                    Circle c = getCircle(e.getX(), e.getY());
+                    String stateName = stateList.get(c).getName();
+                    Text text = new Text(stateName);
+                    text.setTextAlignment(TextAlignment.CENTER);
+                    text.setX(c.getCenterX());
+                    text.setY(c.getCenterY());
+                    root.getChildren().add(text);
+                    text.toFront();
                 }
 
                 else if(onLine(e.getX(), e.getY())){
                     editLine(getLine(e.getX(), e.getY()));
+
+                    Line l = getLine(e.getX(), e.getY());
+                    String transitionValue = transitionList.get(l);
+                    Text text = new Text(transitionValue);
+                    text.setTextAlignment(TextAlignment.CENTER);
+
+
+                    text.setFill(Color.BLACK);
+                    root.getChildren().add(text);
+
+                    if(l.getStartX() >= l.getEndX()){
+                        text.setX((l.getStartX() - l.getEndX()) / 2);
+                    }
+
+                    else {
+                        text.setX((l.getEndX() - l.getStartX()) / 2);
+                    }
+
+                    if(l.getStartY() >= l.getEndY()){
+                        text.setY((l.getStartY() - l.getEndY()) / 2);
+                    }
+
+                    else {
+                        text.setX((l.getEndY() - l.getStartY()) / 2);
+                    }
+
+                    text.toFront();
                 }
 
                 else {

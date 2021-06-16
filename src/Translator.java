@@ -23,6 +23,7 @@ import javafx.stage.Stage;
 import sun.java2d.pipe.hw.AccelDeviceEventNotifier;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 public class Translator {
 
@@ -86,6 +87,7 @@ public class Translator {
             }
         }
 
+        Collections.sort(sigma);
         return sigma;
     }
 
@@ -105,6 +107,7 @@ public class Translator {
             Q.add(s.getName());
         }
 
+        Collections.sort(Q);
         return Q;
     }
 
